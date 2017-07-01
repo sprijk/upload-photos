@@ -1,3 +1,5 @@
+#!/usr/bin/env coffee
+
 async   = require "async"
 config  = require "config"
 debug   = (require "debug") "app"

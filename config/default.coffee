@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 module.exports =
 	google:
 		user: process.env.GOOGLE_USERNAME
