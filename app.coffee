@@ -1,18 +1,19 @@
 #!/usr/bin/env coffee
 
-async   = require "async"
-config  = require "config"
-debug   = (require "debug") "app"
-fs      = require "fs"
-GPhotos = require "upload-gphotos"
-mkdirp  = require "mkdirp"
-moment  = require "moment"
-path    = require "path"
-request = require "request"
-rimraf  = require "rimraf"
+async       = require "async"
+config      = require "config"
+debug       = (require "debug") "app"
+fs          = require "fs"
+GPhotos     = require "upload-gphotos"
+mkdirp      = require "mkdirp"
+moment      = require "moment"
+path        = require "path"
+request     = require "request"
+rimraf      = require "rimraf"
+{ CronJob } = require "cron"
 
-date        = moment().format "YYYY-MM-DD HH:mm:ss"
-picFilePath = path.resolve config.picture.path, "./#{date}.jpg"
+date        = null
+picFilePath = null
 
 getUrl = ->
 	url  = "http://"
@@ -74,13 +75,19 @@ upoadPic = (cb) ->
 
 	async.series arr, cb
 
-console.log "Starting..."
+run = ->
+	date        = moment().format "YYYY-MM-DD HH:mm:ss"
+	picFilePath = path.resolve config.picture.path, "./#{date}.jpg"
 
-async.series [
-	(cb) -> rimraf config.picture.path, cb
-	(cb) -> mkdirp config.picture.path, cb
-	(cb) -> takePic cb
-	(cb) -> upoadPic cb
-], (error) ->
-	throw error if error
-	console.log "Finished"
+	console.log "Starting on #{date}..."
+
+	async.series [
+		(cb) -> rimraf config.picture.path, cb
+		(cb) -> mkdirp config.picture.path, cb
+		(cb) -> takePic cb
+		(cb) -> upoadPic cb
+	], (error) ->
+		throw error if error
+		console.log "Finished"
+
+new CronJob config.crontab, run, null, true, "Europe/Amsterdam"

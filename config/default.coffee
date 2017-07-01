@@ -1,6 +1,8 @@
 require('dotenv').config()
 
 module.exports =
+	crontab: "0 * * * * *"
+
 	google:
 		user: process.env.GOOGLE_USERNAME
 		pass: process.env.GOOGLE_PASSWORD
